@@ -36,3 +36,11 @@ Authorization: Bearer {{authToken}}
     "title": "percebesse",
     "content": "Se percebeste, percebeste. Se não percebeste, faz que percebeste para que eu perceba que tu percebeste. Percebeste?"
 }
+
+###
+
+# @name fetch_many_questions
+
+GET  {{baseUrl}}/questions?page=1
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
