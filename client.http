@@ -33,7 +33,7 @@ Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
 {
-    "title": "percebesse",
+    "title": "percebesse 2",
     "content": "Se percebeste, percebeste. Se não percebeste, faz que percebeste para que eu perceba que tu percebeste. Percebeste?"
 }
 
