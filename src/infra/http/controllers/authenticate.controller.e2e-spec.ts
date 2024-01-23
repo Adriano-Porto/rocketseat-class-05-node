@@ -5,7 +5,7 @@ import { Test } from '@nestjs/testing'
 import { hash } from 'bcryptjs'
 import request from 'supertest'
 
-describe('Create Account (E2E)', () => {
+describe('Authenticate Account (E2E)', () => {
     let app: INestApplication
     let prisma: PrismaService
 
@@ -21,7 +21,7 @@ describe('Create Account (E2E)', () => {
         await app.init()
     })
 
-    test('[POST] /accounts', async () => {
+    test('[POST]/accounts', async () => {
         await prisma.user.create({
             data: {
                 name: 'John Doe',
