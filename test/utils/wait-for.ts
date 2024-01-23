@@ -11,7 +11,6 @@ export async function waitFor(
     assertions: () => void,
     maxDuration = 1000,
 ): Promise<void> {
-    console.log('Waiting test...')
     return new Promise((resolve, reject) => {
         let elapsedTime = 0
   
@@ -22,10 +21,8 @@ export async function waitFor(
                 assertions()
                 clearInterval(interval)
                 resolve()
-                console.log(`Test Accepted in ${elapsedTime}ms`)
             } catch (err) {
                 if (elapsedTime >= maxDuration) {
-                    console.log(`Test Rejected after ${maxDuration}ms`)
                     reject(err)
                 }
             }
