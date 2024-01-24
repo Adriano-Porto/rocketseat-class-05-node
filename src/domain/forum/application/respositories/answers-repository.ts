@@ -1,6 +1,8 @@
 import { PaginationParams } from '@/core/repositories/pagination-params'
 import { Answer } from '../../enterprise/entities/answer'
+import { Injectable } from '@nestjs/common'
 
+@Injectable()
 export abstract class AnswersRespository {
     abstract create(answer: Answer): Promise<void>
     abstract save(question: Answer): Promise<void>
