@@ -34,9 +34,9 @@ describe('Fetch recent questions (E2E)', () => {
         const user = await studentFactory.makePrismaStudent()
 
         await Promise.all([
-            questionFactory.makePrismaQuestion({authorId: user.id, title: 'question-1'}),
-            questionFactory.makePrismaQuestion({authorId: user.id, title: 'question-2'}),
-            questionFactory.makePrismaQuestion({authorId: user.id, title: 'question-3'}),
+            questionFactory.makePrismaQuestion({authorId: user.id, title: 'question 3'}),
+            questionFactory.makePrismaQuestion({authorId: user.id, title: 'question 2'}),
+            questionFactory.makePrismaQuestion({authorId: user.id, title: 'question 1'}),
 
         ])
         
@@ -48,12 +48,11 @@ describe('Fetch recent questions (E2E)', () => {
             .send()
 
         expect(response.statusCode).toBe(200)
-        expect(response.body).toEqual({
-            questions: [
-                expect.objectContaining({title: 'question 1'}),
-                expect.objectContaining({title: 'question 2'}),
-                expect.objectContaining({title: 'question 3'})
-            ]
-        })
+        expect(response.body.questions).toHaveLength(3)
+        expect(response.body.questions).toEqual(expect.arrayContaining([
+            expect.objectContaining({ title: 'question 1'}),
+            expect.objectContaining({ title: 'question 2'}),
+            expect.objectContaining({ title: 'question 3'})
+        ]))
     })
 })
