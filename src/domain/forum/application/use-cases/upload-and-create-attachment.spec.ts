@@ -42,6 +42,5 @@ describe('Upload And Create Attachment', () => {
 
         expect(result.isLeft()).toBe(true)
         expect(result.value).toBeInstanceOf(InvalidAttachmentTypeError)
-
     })
 })
