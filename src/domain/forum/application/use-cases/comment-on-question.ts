@@ -4,6 +4,7 @@ import { QuestionCommentsRepository } from '../respositories/question-comments-r
 import { UniqueEntityID } from '@/core/entities/unique-entity-id'
 import { Either, left, right } from '@/core/either'
 import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found-error'
+import { Injectable } from '@nestjs/common'
 
 interface CommentOnQuestionUseCaseInput {
     authorId: string,
@@ -14,6 +15,8 @@ interface CommentOnQuestionUseCaseInput {
 type CommentOnQuestionUseCaseOutput = Either<ResourceNotFoundError, { 
     questionComment: QuestionComment
  }>
+
+@Injectable()
 export class CommentOnQuestionUseCase {
     constructor(
         private questionsRepository: QuestionsRespository,
@@ -28,8 +31,6 @@ export class CommentOnQuestionUseCase {
         const question = await this.questionsRepository.findById(questionId)
 
         if (!question) return left(new ResourceNotFoundError())
-
-        await this.questionsRepository.create(question)
 
         const questionComment = QuestionComment.create({
             authorId: new UniqueEntityID(authorId),
