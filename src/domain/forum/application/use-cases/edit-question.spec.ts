@@ -74,5 +74,47 @@ describe('Edit Question UseCase', () => {
         expect(result.isLeft()).toBe(true)
         expect(inMemoryQuestionsRepository.items).toHaveLength(1)
     })
+
+    it('it should edit new and removed attachments when editing a question', async () => {
+        const newQuestion = await makeQuestion(
+            {authorId: new UniqueEntityID('author-1')}
+            , new UniqueEntityID('question-id'))
+
+        await inMemoryQuestionsRepository.create(newQuestion)
+        
+        inMemoryQuestionsAttachmentRepository.items.push(
+            await makeQuestionAttachment({
+                questionId: newQuestion.id,
+                attachmentId: new UniqueEntityID('1')
+            })
+        )
+
+        inMemoryQuestionsAttachmentRepository.items.push(
+            await makeQuestionAttachment({
+                questionId: newQuestion.id,
+                attachmentId: new UniqueEntityID('2')
+            })
+        )
+
+        const result = await sut.execute({
+            questionId: newQuestion.id.toValue(),
+            authorId: 'author-1',
+            title: 'Pergunta Teste',
+            content: 'Conteudo teste',
+            attachmentsIds: ['1', '3']
+        })
+
+        
+        expect(result.isRight()).toBe(true)
+        expect(inMemoryQuestionsAttachmentRepository.items).toHaveLength(2)
+        expect(inMemoryQuestionsAttachmentRepository.items).toEqual(
+            expect.arrayContaining([
+                expect.objectContaining({attachmentId: new UniqueEntityID('1')}),
+                expect.objectContaining({attachmentId: new UniqueEntityID('3')}),
+
+            ])
+        )
+    })
     
 })
+
