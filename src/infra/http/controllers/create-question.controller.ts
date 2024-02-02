@@ -1,4 +1,4 @@
-import { Body } from '@nestjs/common'
+import { BadRequestException, Body } from '@nestjs/common'
 import { Controller, Post } from '@nestjs/common'
 import { CurrentUser } from '@/infra/auth/current-user-decorator'
 import { UserPayload } from '@/infra/auth/jwt.strategy'
@@ -9,6 +9,7 @@ import { CreateQuestionUseCase } from '@/domain/forum/application/use-cases/crea
 const createQuestionBodySchema = z.object({
     title: z.string(),
     content: z.string(),
+    attachments: z.array(z.string().uuid()),
 
 })
 
@@ -26,15 +27,19 @@ export class CreateQuestionController {
         @Body(new ZodValidationPipe(createQuestionBodySchema)) body: CreateQuestionBodySchema,
         @CurrentUser() user: UserPayload
     ) {
-        const { title, content } = body
+        const { title, content, attachments } = body
         const { sub: authorId } = user
 
 
-        await this.createQuestion.execute({
+        const result = await this.createQuestion.execute({
             title,
             content,
             authorId,
-            attachmentsIds: [],
+            attachmentsIds: attachments,
         })
+
+        if(result.isLeft()) {
+            throw new BadRequestException()
+        }
     }
 }
