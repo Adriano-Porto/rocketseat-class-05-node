@@ -8,6 +8,7 @@ import { AnswerQuestionUseCase } from '@/domain/forum/application/use-cases/answ
 
 const answerQuestionBodySchema = z.object({
     content: z.string(),
+    attachments: z.array(z.string().uuid())
 
 })
 
@@ -20,13 +21,13 @@ export class AnswerQuestionController {
     constructor(private answerQuestion: AnswerQuestionUseCase) {}
 
     @Post()
-    // async handle(@Request() request: Request) {}
+    // async handle(@Request() request: Request) {} get request related information
     async handle(
         @Body(new ZodValidationPipe(answerQuestionBodySchema)) body: AnswerQuestionBodySchema,
         @Param('questionId') questionId: string,
         @CurrentUser() user: UserPayload
     ) {
-        const { content } = body
+        const { content, attachments } = body
         const { sub: authorId } = user
 
 
@@ -34,7 +35,7 @@ export class AnswerQuestionController {
             authorId,
             questionId,
             content,
-            attachmentsIds: [],
+            attachmentsIds: attachments,
         })
     }
 }
