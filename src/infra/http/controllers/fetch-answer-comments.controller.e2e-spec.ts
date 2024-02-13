@@ -9,7 +9,7 @@ import { AnswerCommentFactory } from 'test/factories/make-answer-comment'
 import { QuestionFactory } from 'test/factories/make-question'
 import { StudentFactory } from 'test/factories/make-student'
 
-describe('Fetch question answercomments (E2E)', () => {
+describe('Fetch Answer Comments (E2E)', () => {
     let app: INestApplication
     let jwt: JwtService
     
@@ -37,7 +37,10 @@ describe('Fetch question answercomments (E2E)', () => {
     })
 
     test('[GET] /answer/:answerId/comments', async () => {
-        const user = await studentFactory.makePrismaStudent()
+        const user = await studentFactory.makePrismaStudent({
+            name: 'John Doe'
+        })
+
 
         const question = await questionFactory.makePrismaQuestion({
             authorId: user.id
@@ -53,6 +56,7 @@ describe('Fetch question answercomments (E2E)', () => {
                 authorId: user.id,
                 answerId: answer.id,
                 content: 'comment 01',
+                
             }),
             answercommentFactory.makePrismaAnswerComment({
                 authorId: user.id,
@@ -73,8 +77,14 @@ describe('Fetch question answercomments (E2E)', () => {
         expect(response.statusCode).toBe(200)
         expect(response.body.comments).toHaveLength(2)
         expect(response.body.comments).toEqual(expect.arrayContaining([
-            expect.objectContaining({ content: 'comment 01'}),
-            expect.objectContaining({ content: 'comment 02'}),
+            expect.objectContaining({
+                content: 'comment 01',
+                authorName: 'John Doe'
+            }),
+            expect.objectContaining({
+                content: 'comment 02',
+                authorName: 'John Doe'
+            }),
         ]))
     })
 })
