@@ -5,7 +5,10 @@ import { FetchQuestionCommentsUseCase } from './fetch-question-comments'
 import { makeQuestionComment } from 'test/factories/make-question-comment'
 import { InMemoryQuestionCommentRepository } from 'test/repositories/in-memory-question-comments-repository'
 import { InMemoryQuestionAttachmentRepository } from 'test/repositories/in-memory-questions-attachments-repository'
+import { InMemoryStudentsRepository } from 'test/repositories/in-memory-students-repository'
+import { makeStudent } from 'test/factories/make-student'
 
+let inMemoryStudentsRepository: InMemoryStudentsRepository
 let inMemoryQuestionsRepository: InMemoryQuestionsRepository
 let inMemoryQuestionCommentRepository: InMemoryQuestionCommentRepository
 let inMemoryQuestionAttachmentRepository: InMemoryQuestionAttachmentRepository
@@ -14,25 +17,32 @@ let sut: FetchQuestionCommentsUseCase
 describe('Fetch Questions Questions UseCase', () => {
     beforeEach(() => {
         inMemoryQuestionAttachmentRepository = new InMemoryQuestionAttachmentRepository()
+        inMemoryStudentsRepository = new InMemoryStudentsRepository()
         inMemoryQuestionsRepository = new InMemoryQuestionsRepository(inMemoryQuestionAttachmentRepository)
-        inMemoryQuestionCommentRepository = new InMemoryQuestionCommentRepository()
+        inMemoryQuestionCommentRepository = new InMemoryQuestionCommentRepository(inMemoryStudentsRepository)
         sut = new FetchQuestionCommentsUseCase(inMemoryQuestionCommentRepository)
     })
     it('should be able to fetch recent questions', async () => {
         const newQuestion = await makeQuestion()
+        const student = await makeStudent({name : 'John Doe'})
+
+        await inMemoryStudentsRepository.items.push(student)
 
         await inMemoryQuestionsRepository.create(newQuestion)
-
+        const comment1 = await makeQuestionComment({questionId: newQuestion.id, authorId: student.id})
+        const comment2 = await makeQuestionComment({questionId: newQuestion.id, authorId: student.id})
+        const comment3 = await makeQuestionComment({questionId: newQuestion.id, authorId: student.id})
+        
         await inMemoryQuestionCommentRepository.create(
-            await makeQuestionComment({questionId: newQuestion.id})
+            comment1
         )
 
         await inMemoryQuestionCommentRepository.create(
-            await makeQuestionComment({questionId: newQuestion.id})
+            comment2
         )
 
         await inMemoryQuestionCommentRepository.create(
-            await makeQuestionComment({questionId: newQuestion.id})
+            comment3
         )
 
         const result = await sut.execute({
@@ -41,7 +51,23 @@ describe('Fetch Questions Questions UseCase', () => {
         })
 
         expect(result.isRight()).toBe(true)
-        expect(result.value?.questionComments).toHaveLength(3)
+        expect(result.value?.comments).toHaveLength(3)
+
+        expect(result.value.comments).toEqual(expect.arrayContaining([
+            expect.objectContaining({
+                author: 'John Doe',
+                commentId: comment1.id
+            }),
+            expect.objectContaining({
+                author: 'John Doe',
+                commentId: comment1.id
+            }),
+            expect.objectContaining({
+                author: 'John Doe',
+                commentId: comment1.id
+            })
+        ]))
+
     })
 
     it('should be able to get paginated question questions', async () => {
@@ -49,9 +75,14 @@ describe('Fetch Questions Questions UseCase', () => {
 
         await inMemoryQuestionsRepository.create(newQuestion)
 
+        const student = await makeStudent({name : 'John Doe'})
+
+        await inMemoryStudentsRepository.items.push(student)
+
+
         for (let i = 1; i <= 25; i ++) {
             await inMemoryQuestionCommentRepository.create(
-                await makeQuestionComment({questionId: newQuestion.id})
+                await makeQuestionComment({questionId: newQuestion.id, authorId: student.id})
             )
         }
 
@@ -67,7 +98,7 @@ describe('Fetch Questions Questions UseCase', () => {
         expect(fetchPageOne.isRight()).toBe(true)
         expect(fetchPageTwo.isRight()).toBe(true)
 
-        expect(fetchPageOne.value?.questionComments).toHaveLength(20)
-        expect(fetchPageTwo.value?.questionComments).toHaveLength(5)
+        expect(fetchPageOne.value?.comments).toHaveLength(20)
+        expect(fetchPageTwo.value?.comments).toHaveLength(5)
     })
 })
