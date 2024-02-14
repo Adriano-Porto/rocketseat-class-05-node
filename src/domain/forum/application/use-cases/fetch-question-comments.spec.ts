@@ -7,18 +7,23 @@ import { InMemoryQuestionCommentRepository } from 'test/repositories/in-memory-q
 import { InMemoryQuestionAttachmentRepository } from 'test/repositories/in-memory-questions-attachments-repository'
 import { InMemoryStudentsRepository } from 'test/repositories/in-memory-students-repository'
 import { makeStudent } from 'test/factories/make-student'
+import { InMemoryAttachmentsRepository } from 'test/repositories/in-memory-attachments-repository'
 
 let inMemoryStudentsRepository: InMemoryStudentsRepository
 let inMemoryQuestionsRepository: InMemoryQuestionsRepository
 let inMemoryQuestionCommentRepository: InMemoryQuestionCommentRepository
 let inMemoryQuestionAttachmentRepository: InMemoryQuestionAttachmentRepository
+let inMemoryAttachmentsRepository: InMemoryAttachmentsRepository
+
 let sut: FetchQuestionCommentsUseCase
 
 describe('Fetch Questions Questions UseCase', () => {
     beforeEach(() => {
+        inMemoryAttachmentsRepository = new InMemoryAttachmentsRepository() 
+
         inMemoryQuestionAttachmentRepository = new InMemoryQuestionAttachmentRepository()
         inMemoryStudentsRepository = new InMemoryStudentsRepository()
-        inMemoryQuestionsRepository = new InMemoryQuestionsRepository(inMemoryQuestionAttachmentRepository)
+        inMemoryQuestionsRepository = new InMemoryQuestionsRepository(inMemoryQuestionAttachmentRepository, inMemoryAttachmentsRepository, inMemoryStudentsRepository)
         inMemoryQuestionCommentRepository = new InMemoryQuestionCommentRepository(inMemoryStudentsRepository)
         sut = new FetchQuestionCommentsUseCase(inMemoryQuestionCommentRepository)
     })

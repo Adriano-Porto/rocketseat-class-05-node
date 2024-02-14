@@ -2,13 +2,15 @@ import { expect, describe, it } from 'vitest'
 import { InMemoryQuestionCommentRepository } from 'test/repositories/in-memory-question-comments-repository'
 import { DeleteQuestionCommentUseCase } from './delete-question-comment'
 import { makeQuestionComment } from 'test/factories/make-question-comment'
+import { InMemoryStudentsRepository } from 'test/repositories/in-memory-students-repository'
 
 let inMemoryQuestionCommentsRepository: InMemoryQuestionCommentRepository
 let sut: DeleteQuestionCommentUseCase
+let inMemoryStudentsRepository: InMemoryStudentsRepository
 
 describe('Delete Question Comment', () => {
     beforeEach(() => {
-        inMemoryQuestionCommentsRepository = new InMemoryQuestionCommentRepository()
+        inMemoryQuestionCommentsRepository = new InMemoryQuestionCommentRepository(inMemoryStudentsRepository)
         sut = new DeleteQuestionCommentUseCase(inMemoryQuestionCommentsRepository)
     })
     it('should be able to delete question comment', async () => {

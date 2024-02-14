@@ -52,7 +52,6 @@ describe('Delete QuestionComment (E2E)', () => {
             .delete(`/question/comments/${questioncommentId}`)
             .set('Authorization', `Bearer ${accessToken}`)
             .send()
-
         
 
         expect(response.statusCode).toBe(204)
